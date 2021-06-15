@@ -17,11 +17,11 @@ const emailReducer = (state, action) => {
 
 const passwordReducer = (state, action) => {
   if (action.type === "PASSWORD_INPUT") {
-    return { value: action.val, isValid: action.val.includes("@") };
+    return { value: action.val, isValid: action.val.trim().length > 6 };
   }
 
   if (action.type === "PASSWORD_BLUR") {
-    return { value: state.value, isValid: state.value.includes("@") };
+    return { value: state.value, isValid: state.value.trim().length > 6 };
   }
   return { value: "", isValid: false };
 };
@@ -50,27 +50,24 @@ const Login = (props) => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const identifier = setTimeout(() => {
-  //     console.log("Checking form validity!");
-  //     setFormIsValid(
-  //       enteredEmail.includes("@") && enteredPassword.trim().length > 6
-  //     );
-  //   }, 500);
+  const { isValid: emailIsValid } = emailState;
+  const { isValid: passwordIsValid } = passwordState;
 
-  //   clearTimeout();
+  useEffect(() => {
+    const identifier = setTimeout(() => {
+      console.log("Checking form validity!");
+      setFormIsValid(emailIsValid && passwordIsValid);
+    }, 500);
 
-  //   return () => {
-  //     console.log("Clean Up");
-  //     clearTimeout(identifier);
-  //   };
-  // }, [setFormIsValid, enteredEmail, enteredPassword]);
+    return () => {
+      console.log("Clean Up");
+      clearTimeout(identifier);
+    };
+  }, [emailIsValid, passwordIsValid]);
 
   const emailChangeHandler = (event) => {
     dispatchEmail({ type: "USER_INPUT", val: event.target.value });
-    setFormIsValid(
-      event.target.value.includes("@") && passwordState.value.trim().length > 6
-    );
+    // setFormIsValid(event.target.value.includes("@") && passwordState.isValid);
   };
 
   const passwordChangeHandler = (event) => {
